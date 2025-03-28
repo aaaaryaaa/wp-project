@@ -1,0 +1,41 @@
+<!-- templates/products/product_list.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <h3>Categories</h3>
+        <div class="list-group">
+            {% for category in categories %}
+                <a href="{% url 'product_list' %}?category={{ category.name }}" 
+                   class="list-group-item list-group-item-action">
+                    {{ category.name }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-md-9">
+        <h2>Products</h2>
+        <div class="row">
+            {% for product in products %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text">{{ product.description|truncatewords:10 }}</p>
+                            <p class="card-text"><strong>Price: ${{ product.price }}</strong></p>
+                            <a href="{% url 'product_detail' product.pk %}" class="btn btn-primary">View Details</a>
+                            <a href="{% url 'add_to_cart' product.id %}" class="btn btn-success">Add to Cart</a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <p>No products available.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
