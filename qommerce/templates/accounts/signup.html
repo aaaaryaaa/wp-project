@@ -22,7 +22,140 @@
         <p class="mt-3">Already have an account? <a href="{% url 'login' %}">Login</a></p>
     </div>
 </div>
-
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+  // Add novalidate attribute to the form
+  $('form').attr('novalidate', 'novalidate');
+  
+  // Field selectors - adjust based on your form field names
+  let phoneField = $('input[name="phone_number"]');
+  let emailField = $('input[name="email"]');
+  let passwordField = $('input[name="password1"]');
+  let confirmPasswordField = $('input[name="password2"]');
+  
+  // Add error message containers for each field
+  if (phoneField.length) {
+    phoneField.after('<div class="phone-error text-danger" style="display:none;">Please enter a valid 10-digit phone number</div>');
+  }
+  
+  if (emailField.length) {
+    emailField.after('<div class="email-error text-danger" style="display:none;">Please enter a valid Gmail address (ending with @gmail.com)</div>');
+  }
+  
+  if (passwordField.length) {
+    passwordField.after('<div class="password-error text-danger" style="display:none;">Password must be at least 8 characters and include a number and special character</div>');
+  }
+  
+  if (confirmPasswordField.length) {
+    confirmPasswordField.after('<div class="confirm-password-error text-danger" style="display:none;">Passwords do not match</div>');
+  }
+  
+  // Validation functions
+  function validatePhoneNumber() {
+    if (!phoneField.length) return true;
+    
+    let phoneValue = phoneField.val().replace(/\D/g, ''); // Remove non-digits
+    
+    if (phoneValue.length !== 10) {
+      $('.phone-error').show();
+      return false;
+    } else {
+      $('.phone-error').hide();
+      return true;
+    }
+  }
+  
+  function validateEmail() {
+    if (!emailField.length) return true;
+    
+    let emailValue = emailField.val().trim();
+    let gmailRegex = /@gmail\.com$/i;
+    
+    if (!emailValue || !gmailRegex.test(emailValue)) {
+      $('.email-error').show();
+      return false;
+    } else {
+      $('.email-error').hide();
+      return true;
+    }
+  }
+  
+  function validatePassword() {
+    if (!passwordField.length) return true;
+    
+    let passwordValue = passwordField.val();
+    // Password must be at least 8 characters and include a number and special character
+    let passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])(.{8,})$/;
+    
+    if (!passwordRegex.test(passwordValue)) {
+      $('.password-error').show();
+      return false;
+    } else {
+      $('.password-error').hide();
+      return true;
+    }
+  }
+  
+  function validateConfirmPassword() {
+    if (!confirmPasswordField.length || !passwordField.length) return true;
+    
+    let passwordValue = passwordField.val();
+    let confirmValue = confirmPasswordField.val();
+    
+    if (confirmValue !== passwordValue) {
+      $('.confirm-password-error').show();
+      return false;
+    } else {
+      $('.confirm-password-error').hide();
+      return true;
+    }
+  }
+  
+  // Bind validation events
+  phoneField.on('blur', validatePhoneNumber);
+  phoneField.on('keyup', function() {
+    if ($(this).val().replace(/\D/g, '').length >= 10) {
+      validatePhoneNumber();
+    }
+  });
+  
+  emailField.on('blur', validateEmail);
+  
+  passwordField.on('blur', validatePassword);
+  passwordField.on('keyup', function() {
+    if (confirmPasswordField.val().length > 0) {
+      validateConfirmPassword();
+    }
+  });
+  
+  confirmPasswordField.on('blur', validateConfirmPassword);
+  confirmPasswordField.on('keyup', validateConfirmPassword);
+  
+  // Form submission validation
+  $('form').on('submit', function(e) {
+    let isValid = true;
+    
+    // Validate all fields
+    if (!validatePhoneNumber()) isValid = false;
+    if (!validateEmail()) isValid = false;
+    if (!validatePassword()) isValid = false;
+    if (!validateConfirmPassword()) isValid = false;
+    
+    if (!isValid) {
+      e.preventDefault();
+      // Scroll to the first error
+      let firstError = $('.text-danger:visible').first();
+      if (firstError.length) {
+        $('html, body').animate({
+          scrollTop: firstError.offset().top - 100
+        }, 200);
+      }
+    }
+  });
+});
+</script>
+{% endblock %}
 <style>
     /* Style Django form inputs to match login.html */
     input[type="text"], 
