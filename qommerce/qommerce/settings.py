@@ -8,7 +8,8 @@ SECRET_KEY = 'your-secret-key-here'  # Replace with a real secret key
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['wp-project-3-jihg.onrender.com']
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
